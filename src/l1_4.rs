@@ -1,6 +1,7 @@
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::sync::mpsc;
+use std::process;
 
 pub fn infinity_write_read(workers_amount: usize) {
     let (tx, rx) = mpsc::channel();
@@ -17,7 +18,7 @@ pub fn infinity_write_read(workers_amount: usize) {
                     }
                     Err(_) => {
                         println!("Channel closed");
-                        break;
+                        process::exit(1);
                     }
                 }
             }
