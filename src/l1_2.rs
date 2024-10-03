@@ -1,19 +1,21 @@
 use std::thread;
 
-fn print_squares_parallel(arr: &[i32]) {
+fn print_squares_parallel(n: i32) {
     let mut handles = vec![];
 
-    for &number in arr {
+    for number in 1..=n {
         let handle = thread::spawn(move || {
-            let square = number * number;
-            square
+            number.checked_mul(number)
         });
         handles.push(handle);
     }
 
     for handle in handles {
         match handle.join() {
-            Ok(result) => println!("{}", result),
+            Ok(result) => match result {
+                Some(r) => println!("{r}"),
+                None => println!("Overflow"),
+            }
             Err(_) => println!("Error"),
         }
     }
@@ -26,7 +28,6 @@ mod tests {
 
     #[test]
     fn test_working () {
-        let arr = [1, 2, 3, 4];
-        print_squares_parallel(&arr);
+        print_squares_parallel(10);
     }
 }
