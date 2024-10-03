@@ -8,7 +8,7 @@ fn parallel_sum_of_squares(n: u64) -> u64 {
     for i in 1..=n {
         let thread_sender = sender.clone();
         let handle = thread::spawn(move || {
-            let square = i.checked_mul(i).expect("Overflow");
+            let square = i * i;
             thread_sender.send(square).unwrap();
         });
         handles.push(handle);

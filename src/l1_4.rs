@@ -18,7 +18,7 @@ pub fn infinity_write_read(workers_amount: usize) {
                     }
                     Err(_) => {
                         println!("Channel closed");
-                        process::exit(1);
+                        break;
                     }
                 }
             }
