@@ -1,9 +1,9 @@
 use std::thread;
 
-fn print_squares_parallel<const N: usize>(arr: [i32; N]) {
+fn print_squares_parallel(arr: &[i32]) {
     let mut handles = vec![];
 
-    for &number in &arr {
+    for &number in arr {
         let handle = thread::spawn(move || {
             let square = number * number;
             square
@@ -27,6 +27,6 @@ mod tests {
     #[test]
     fn test_working () {
         let arr = [1, 2, 3, 4];
-        print_squares_parallel(arr);
+        print_squares_parallel(&arr);
     }
 }
