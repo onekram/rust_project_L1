@@ -1,37 +1,30 @@
 use rand::Rng;
-use std::fmt::Debug;
 
-fn partition<T: Ord + Clone, R: Rng>(arr: &mut [T], rng: &mut R) -> usize {
-    let pivot = arr[rng.gen_range(0..arr.len())].clone();
-    let mut l = 0usize;
-    let mut r = arr.len() - 1;  // Need clone cuz mut reference in arr.swap
-    loop {
-        while arr[l] < pivot {
-            l += 1;
-        }
+fn partition<T: Ord, R: Rng>(arr: &mut [T], rng: &mut R) -> usize {
+    let l = 0usize;
+    let r = arr.len() - 1;
+    arr.swap(rng.gen_range(l..=r), r);
+    let mut i: usize = l;
 
-        while arr[r] > pivot {
-            r -= 1;
+    for j in l..=r - 1 {
+        if arr[j as usize] <= arr[r] {
+            arr.swap(i, j);
+            i += 1;
         }
-
-        if l >= r {
-            return r;
-        }
-        arr.swap(l, r);
-        l += 1;
-        r -= 1;
     }
-} 
+    arr.swap(i, r);
+    i
+}
 
-fn quick_sort_impl<T: Ord + Clone, R: Rng>(arr: &mut [T],  rng: &mut R) {
+fn quick_sort_impl<T: Ord, R: Rng>(arr: &mut [T], rng: &mut R) {
     if arr.len() > 1 {
-        let idx = partition(arr, rng);
-        quick_sort_impl(&mut arr[0..=idx], rng);
-        quick_sort_impl(&mut arr[idx+1..], rng);
+        let partition_idx = partition(arr, rng);
+        quick_sort_impl(&mut arr[..partition_idx],rng);
+        quick_sort_impl(&mut arr[partition_idx+1..], rng);
     }
 }
 
-fn quick_sort<T: Ord + Clone>(arr: &mut [T]) {
+fn quick_sort<T: Ord>(arr: &mut [T]) {
     let mut rng = rand::thread_rng();
     quick_sort_impl(arr, &mut rng);
 }
@@ -58,7 +51,7 @@ mod tests {
     fn random_test() {
         let mut arr = Vec::new();
         let mut rng = rand::thread_rng();
-        for _ in 0..10 {
+        for _ in 0..100 {
             let value = rng.gen_range(0..1000);
             arr.push(value);
         }
