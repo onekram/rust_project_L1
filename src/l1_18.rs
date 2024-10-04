@@ -9,7 +9,7 @@ mod tests {
 
     #[test]
     fn test_reverse_strings() {
-        let mut s = String::from("hello world");
-        assert_eq!(reverse_strings(&s), "dlrow olleh");
+        let s = String::from("Привет");
+        assert_eq!(reverse_strings(&s), "тевирП");
     }
 }
