@@ -4,19 +4,19 @@ use std::time::{Duration, Instant};
 
 fn for_a_while_writing(seconds: u64) {
 
-    let (tx, rx) = mpsc::channel();
+    let (tx, rx) = mpsc::channel();  // Create sender and receiver
 
     let receiver = thread::spawn(move || {
-        while let Ok(message) = rx.recv() {
+        while let Ok(message) = rx.recv() {  // While can - read channel
             println!("Recived message: {}", message);
         }
     });
 
 
     let sender = thread::spawn(move || {
-        let start_time = Instant::now();
+        let start_time = Instant::now();  // Store start time
         let mut i = 0;
-        while start_time.elapsed() < Duration::from_secs(seconds) {
+        while start_time.elapsed() < Duration::from_secs(seconds) {  // Send message via channel while time is not over
             let message = format!("Message number: {}", i);
             tx.send(message).expect("Fail to send message");
             thread::sleep(Duration::from_millis(100));
