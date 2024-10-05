@@ -16,12 +16,10 @@ fn parallel_sum_of_squares(n: i32) -> i32 {
         handles.push(handle);  // Store handle into vec
     }
 
-    for handle in handles {
-        handle.join().expect("Erorr join handle");  // Wait all handers done
-    }
+    drop(sender);  // Close channel so reseiver knows when to stop
 
     let mut sum_of_squares: i32 = 0;
-    while let Ok(value) = receiver.try_recv() {  // While can get value from channel
+    while let Ok(value) = receiver.recv() { // While can get value from channel
         sum_of_squares = match sum_of_squares.checked_add(value) {  // Add value to sum
             Some(value) => value,
             None => {
@@ -29,6 +27,10 @@ fn parallel_sum_of_squares(n: i32) -> i32 {
                 break;
             }
         }
+    }
+
+    for handle in handles {
+        handle.join().expect("Erorr join handle");  // Wait all handers done
     }
 
     sum_of_squares
@@ -46,5 +48,10 @@ mod tests {
     #[test]
     fn second() {
         assert_eq!(parallel_sum_of_squares(14), 1015);
+    }
+
+    #[test]
+    fn big_num_test() {
+        assert_eq!(parallel_sum_of_squares(200), 2686700);
     }
 }
