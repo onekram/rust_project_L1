@@ -14,7 +14,7 @@ fn stop_by_channel() {
                 Ok(message) => {
                     println!("Recived: {}", message);
                 }
-                Err(_) => {
+                Err(_) => {  // Error means channel is closed
                     println!("Channel closed");
                     break;
                 }
@@ -25,13 +25,13 @@ fn stop_by_channel() {
     let sender = thread::spawn(move || {
         let start_time = Instant::now();
         let mut count = 0;
-        while start_time.elapsed() < Duration::from_secs(3) {
+        while start_time.elapsed() < Duration::from_secs(3) {  // Send message to receiver for 3 seconds
             let message = format!("Message {}", count);
             tx.send(message).expect("Fail to send message");
             thread::sleep(std::time::Duration::from_millis(300));
             count += 1;
         }
-        drop(tx);
+        drop(tx);  // Drop sender after
     });
 
 
@@ -52,14 +52,14 @@ async fn stop_by_cancel_token() {
                     break;
                 }
                 _ = tokio::time::sleep(Duration::from_secs(1)) => {
-                    println!("Task 1 working {}", count);
+                    println!("Task 1 working {}", count);  // Show progress
                     count += 1;
                 }
             }
         }
     });
 
-    let task2= tokio::spawn(async move {
+    let task2= tokio::spawn(async move {  // Wair 4 seconds and cancel task
         sleep(Duration::from_secs(4)).await;
         token_clone.cancel();
     });
