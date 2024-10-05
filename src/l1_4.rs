@@ -4,15 +4,15 @@ use std::sync::mpsc;
 
 pub fn infinity_write_read(workers_amount: usize) {
     let (tx, rx) = mpsc::channel();
-    let rx = Arc::new(Mutex::new(rx));
+    let rx = Arc::new(Mutex::new(rx));  // Use Arc and Mutes to use receiver in different threads
 
     for id in 0..workers_amount {
-        let rx = Arc::clone(&rx);
+        let rx = Arc::clone(&rx);  // Clone receiver
         thread::spawn(move || {
             loop {
-                let data = rx.lock().expect("Error lock receiver").recv();
+                let data = rx.lock().expect("Error lock receiver").recv();  // Get data from receiver
                 match data {
-                    Ok(message) => {
+                    Ok(message) => {  // If no error, print message
                         println!("Recived: {}, by worker {}", message, id);
                     }
                     Err(_) => {
@@ -25,7 +25,7 @@ pub fn infinity_write_read(workers_amount: usize) {
     }
 
     let mut count = 0;
-    loop {
+    loop {  // Sending message endlessly
         let message = format!("Message {}", count);
         tx.send(message).expect("Fail to send message");
         count += 1;
