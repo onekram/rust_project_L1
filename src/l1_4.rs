@@ -31,3 +31,13 @@ pub fn infinity_write_read(workers_amount: usize) {
         count += 1;
     }
 }
+
+#[cfg(all(test, feature = "run-tests"))]
+mod tests {
+    use super::*;
+
+    #[test]
+     fn working_test() {
+        infinity_write_read(3);
+    }
+}

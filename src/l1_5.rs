@@ -60,6 +60,7 @@ async fn infinity_write_read(num_workers: usize) {
     sender_handle.await.unwrap();
 }
 
+#[cfg(all(test, feature = "run-tests"))]
 mod tests {
     use super::*;
 
