@@ -39,7 +39,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn sum_of_squares() {
+    fn first() {
         assert_eq!(parallel_sum_of_squares(4), 30);
+    }
+
+    #[test]
+    fn second() {
+        assert_eq!(parallel_sum_of_squares(14), 1015);
     }
 }
