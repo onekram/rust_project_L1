@@ -10,7 +10,7 @@ pub fn infinity_write_read(workers_amount: usize) {
         let rx = Arc::clone(&rx);
         thread::spawn(move || {
             loop {
-                let data = rx.lock().unwrap().recv();
+                let data = rx.lock().expect("Error lock receiver").recv();
                 match data {
                     Ok(message) => {
                         println!("Recived: {}, by worker {}", message, id);
