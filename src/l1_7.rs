@@ -35,8 +35,8 @@ fn stop_by_channel() {
     });
 
 
-    receiver.join().unwrap();
-    sender.join().unwrap();
+    receiver.join().expect("Couldn't join on the associated thread");
+    sender.join().expect("Couldn't join on the associated thread");
 }
 
 async fn stop_by_cancel_token() {
@@ -64,8 +64,8 @@ async fn stop_by_cancel_token() {
         token_clone.cancel();
     });
 
-    task1.await;
-    task2.await;
+    task1.await.expect("Error while waiting for task 1");
+    task2.await.expect("Error while waiting for task 2");
 }
 
 #[cfg(test)]
