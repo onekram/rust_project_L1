@@ -1,24 +1,39 @@
-use flume::{unbounded, Receiver, Sender};
-use std::sync::Arc;
+use flume;
 use tokio::signal;
 use tokio::task;
 use tokio::time::{self, Duration};
+use tokio_util::sync::CancellationToken;
 
-async fn worker(id: usize, receiver: Arc<Receiver<String>>) {
-    while let Ok(message) = receiver.recv_async().await {
-        println!("Worker {} received: {}", id, message);
-    }
-}
+async fn infinity_write_read(num_workers: usize) {
+    let token = CancellationToken::new();
+    let token_clone = token.clone();
 
-async fn run_workers(num_workers: usize) {
-    let (sender, receiver) = unbounded();
-    let receiver = Arc::new(receiver);
+    let (tx, rx) = flume::unbounded();
 
     let mut handles = vec![];
     for id in 0..num_workers {
-        let receiver_clone = Arc::clone(&receiver);
+        let rx_clone = rx.clone();
+        let tk_clone = token_clone.clone();
         let handle = task::spawn(async move {
-            worker(id, receiver_clone).await;
+            loop {
+                tokio::select! {
+                    data = rx_clone.recv_async() => {
+                        match data {
+                            Ok(message) => {
+                                println!("Recived: \"{}\", by worker {}", message, id);
+                            }
+                            Err(_) => {
+                                println!("Channel closed");
+                                break;
+                            }
+                        }
+                    }
+                    _ = tk_clone.cancelled() => {
+                        println!("Cancellation signal received by worker {id}. Exiting...");
+                        break;
+                    }
+                }
+            }
         });
         handles.push(handle);
     }
@@ -27,21 +42,29 @@ async fn run_workers(num_workers: usize) {
         let mut count = 0;
         loop {
             let message = format!("Message {}", count);
-            if sender.send(message).is_err() {
-                break;
-            }
+            tx.send(message).expect("Failed to send message");
             count += 1;
             time::sleep(Duration::from_secs(1)).await;
         }
     });
 
-    let _ = signal::ctrl_c().await;
+    signal::ctrl_c().await.expect("Failed to listen for Ctrl+C");
+    println!("\nCtrl+C received, all will be finished.");
+    token_clone.cancel();
+
 
     for handle in handles {
-        let _ = handle.await;
+        handle.await.unwrap();
     }
 
-    let _ = sender_handle.await;
+    sender_handle.await.unwrap();
+}
 
-    println!("All workers have finished.");
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn working_test() {
+        infinity_write_read(3).await;
+    }
 }
