@@ -6,13 +6,13 @@ struct Person {
     name: String,
 }
 
-impl Action for Person {
+impl Action for Person {  // implement trait for struct
     fn say(&self) {
         println!("Hello, {}", self.name);
     }
 }
 impl Person {
-    fn new(name: &str) -> Self{
+    fn new(name: &str) -> Self{ // add constructor
         return Person{name: name.to_string()};
     }
 }
