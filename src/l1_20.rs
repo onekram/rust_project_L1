@@ -1,4 +1,3 @@
-// Интерфейс нового принтера
 trait Printer {
     fn print(&self, text: &str);
 }
@@ -10,13 +9,13 @@ impl OldPrinter {
         println!("Old printer method 'print_old' message: {}", text);
     }
 }
-struct OldPrinterAdapter {
-    old_printer: OldPrinter,
+struct PrinterAdapter {
+    adaptee: OldPrinter,
 }
 
-impl Printer for OldPrinterAdapter {
+impl Printer for PrinterAdapter {
     fn print(&self, text: &str) {
-        self.old_printer.print_old(text);
+        self.adaptee.print_old(text);
     }
 }
 
@@ -39,7 +38,7 @@ mod tests {
         new_printer.print("Hello from the new printer!");
     
         let old_printer = OldPrinter;
-        let old_printer_adapter = OldPrinterAdapter { old_printer };
+        let old_printer_adapter = PrinterAdapter { adaptee: old_printer };
         old_printer_adapter.print("Hello from the old printer via adapter!");
     }
 }
