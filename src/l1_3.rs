@@ -1,28 +1,36 @@
 use std::sync::mpsc;
 use std::thread;
 
-fn parallel_sum_of_squares(n: u64) -> u64 {
+fn parallel_sum_of_squares(n: i32) -> i32 {
     let (sender, receiver) = mpsc::channel();
     let mut handles = vec![];
 
     for i in 1..=n {
         let thread_sender = sender.clone();
         let handle = thread::spawn(move || {
-            let square = i * i;
-            thread_sender.send(square).unwrap();
+            if let Some(value) = i.checked_mul(i) {
+                thread_sender.send(value).expect("Erorr send value")
+            }
+            
         });
         handles.push(handle);
     }
 
     for handle in handles {
-        handle.join().unwrap();
+        handle.join().expect("Erorr join handle");
     }
 
-    let mut sum_of_squares = 0;
-    for _ in 1..=n {
-        sum_of_squares += receiver.recv().unwrap();
+    let mut sum_of_squares: i32 = 0;
+    while let Ok(value) = receiver.try_recv() {
+        sum_of_squares = match sum_of_squares.checked_add(value) {
+            Some(value) => value,
+            None => {
+                println!("Overflow");
+                break;
+            }
+        }
     }
-    println!("{sum_of_squares}");
+
     sum_of_squares
 }
 
