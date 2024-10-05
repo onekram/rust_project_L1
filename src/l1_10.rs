@@ -51,7 +51,7 @@ mod tests {
     use super::*;
 
     #[test] 
-    fn simple_test() {
+    fn working_test() {
         conveyor();
     }
 }
