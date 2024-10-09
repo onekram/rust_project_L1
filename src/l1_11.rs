@@ -2,12 +2,12 @@ use std::collections::HashMap;
 
 
 fn split_temperatures_into_ranges(values: &Vec<f32>) -> HashMap<String, Vec<f32>>{
-    let mut map: HashMap<String, Vec<f32>> = HashMap::new();
+    let mut map: HashMap<String, Vec<f32>> = HashMap::new();  // Create map to store values
     for  v in values {
         let lower_bound = (v / 10.0).floor() * 10.0;
         let upper_bound = lower_bound + 10.0;
         let key = format!("[{lower_bound}, {upper_bound})");
-        map.entry(key).or_insert_with(Vec::new).push(*v);
+        map.entry(key).or_insert_with(Vec::new).push(*v);  // Put value in vector contained in map, if not exist - create empty vector and push in it
     }
     map
 }
