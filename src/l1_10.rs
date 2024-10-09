@@ -1,6 +1,6 @@
 use std::sync::mpsc::{self, Sender, Receiver};
 use std::thread;
-use std::time::{Duration};
+use std::time::Duration;
 
 fn conveyor() { 
     // Create two channels
