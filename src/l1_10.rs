@@ -3,6 +3,7 @@ use std::thread;
 use std::time::{Duration};
 
 fn conveyor() { 
+    // Create two channels
     let (tx1, rx1): (Sender<i32>, Receiver<i32>) = mpsc::channel();
     let (tx2, rx2): (Sender<i32>, Receiver<i32>) = mpsc::channel();
 
@@ -21,7 +22,7 @@ fn conveyor() {
             tx2.send(data.wrapping_pow(2)).expect("Error sending message via second channel");
             println!("Message {data} send via first channel");
         }
-    });
+    });  // Create reader of first and writer of second channel
 
     thread::spawn(move || {
         loop {
@@ -37,13 +38,13 @@ fn conveyor() {
             };
             println!("Received square data: {data}");
         }
-    });
+    }); // Create reader of second
 
     for el in 1..=10 {
         tx1.send(el).expect("Error sending message via first channel");
         println!("Message {el} send via first channel");
         thread::sleep(Duration::from_millis(300));
-    }
+    }  // Create writer to second
 }
 
 #[cfg(test)]
