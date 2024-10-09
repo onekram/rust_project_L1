@@ -4,17 +4,17 @@ use std::sync::{Arc, Mutex};
 use dashmap::DashMap;
 
 fn hash_map_with_mutex(elements: Vec<(String, i32)>) -> HashMap<String, i32> {
-    let map = Arc::new(Mutex::new(HashMap::new()));
+    let map = Arc::new(Mutex::new(HashMap::new())); //  Put map in arc mutex
     let mut handles = vec![];
 
-    for (id, (key, value)) in elements.iter().enumerate() {
-        let map_clone = Arc::clone(&map);
+    for (id, (key, value)) in elements.iter().enumerate() {  // Every element should be inserted into map via its own thread
+        let map_clone = Arc::clone(&map);  // Clone map between threads
         let key_clone = key.clone();
         let value_clone = *value;
 
         let handler = thread::spawn(move || {
-            let mut map_lock = map_clone.lock().expect(&format!("Error while locking map in thread {id}"));
-            map_lock.insert(key_clone, value_clone);
+            let mut map_lock = map_clone.lock().expect(&format!("Error while locking map in thread {id}"));  // Lock map for this thread
+            map_lock.insert(key_clone, value_clone);  // Put element into map
             println!("Added element to map from thread {id}");
         });
         handles.push(handler);
@@ -24,20 +24,20 @@ fn hash_map_with_mutex(elements: Vec<(String, i32)>) -> HashMap<String, i32> {
         handle.join().unwrap();
     }
 
-    Arc::try_unwrap(map).expect("Failed to unwrap Arc").into_inner().expect("Failed to unlock Mutex")
+    Arc::try_unwrap(map).expect("Failed to unwrap Arc").into_inner().expect("Failed to unlock Mutex")  // Return map
 }
 
 fn dash_map(elements: Vec<(String, i32)>) -> DashMap<String, i32> {
-    let map = Arc::new(DashMap::new());
+    let map = Arc::new(DashMap::new());  // Put map in arc
     let mut handles = vec![];
 
     for (id, (key, value)) in elements.iter().enumerate() {
-        let map_clone = Arc::clone(&map);
+        let map_clone = Arc::clone(&map);  // Clone map between threads
         let key_clone = key.clone();
         let value_clone = value.clone();
 
         let handler = thread::spawn(move || {
-            map_clone.insert(key_clone, value_clone);
+            map_clone.insert(key_clone, value_clone);  // Put element into map
             println!("Added element to map from thread {id}");
         });
         handles.push(handler);
@@ -47,7 +47,7 @@ fn dash_map(elements: Vec<(String, i32)>) -> DashMap<String, i32> {
         handle.join().unwrap();
     };
 
-    Arc::try_unwrap(map).expect("Failed to unwrap Arc")
+    Arc::try_unwrap(map).expect("Failed to unwrap Arc")  // Return map
 }
 
 #[cfg(test)]
