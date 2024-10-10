@@ -1,5 +1,5 @@
 fn reverse_strings(s: &String) -> String {
-    s.chars().rev().collect::<String>()
+    s.chars().rev().collect::<String>()  // Split string to chars (one char for one unicode character) and collect to string
 }
 
 
